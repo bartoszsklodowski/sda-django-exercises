@@ -60,9 +60,27 @@ class OscarForm(Form):
     movie = ModelChoiceField(queryset=Movie.objects.all())
     actor = ModelChoiceField(queryset=Actor.objects.all())
 
+    def clean(self):
+        result = super().clean()
+        for oscar in Oscar.objects.all():
+            if result["category"] == oscar.category and result["year"] == oscar.year:
+                raise ValidationError("Oscar is already exist")
+            if result["movie"] == oscar.movie or result["actor"] == oscar.actor:
+                raise ValidationError("Oscar is already assigned")
+        return result
+
 
 class OscarModelForm(ModelForm):
 
     class Meta:
         model = Oscar
         fields = "__all__"
+
+    def clean(self):
+        result = super().clean()
+        for oscar in Oscar.objects.all():
+            if result["category"] == oscar.category and result["year"] == oscar.year:
+                raise ValidationError("Oscar is already exist")
+            if result["movie"] == oscar.movie or result["actor"] == oscar.actor:
+                raise ValidationError("Oscar is already assigned")
+        return result
