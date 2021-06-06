@@ -1,6 +1,6 @@
 from django.urls import path
 
-from movies.views import hello, actors, index_movies, countries, movies, oscars
+from movies.views import actors, index_movies, countries, movies, oscars
 from movies.views import ActorView, ActorTemplateView, ActorListView, CountryView, CountryTemplateView, CountryListView
 from movies.views import MovieView, MovieTemplateView, MovieListView, OscarView, OscarTemplateView, OscarListView
 from movies.views import actor_form, country_form, movie_form, oscar_form, ActorFormView, CountryFormView, MovieFormView, OscarFormView
@@ -16,7 +16,6 @@ app_name = "movies"
 
 urlpatterns = [
     path('', index_movies, name='index'),
-    path('hello/', hello),
     path('actors/', actors, name='actors'),
     path('countries/', countries, name='countries'),
     path('movies/', movies, name='movies'),

@@ -33,7 +33,7 @@ def animals(request):
     animals_str = request.GET.get("animals","")
     return render(request, template_name='my_template.html', context={'animals': animals_str.split(",")})
 
-@login_required(login_url="/polls/")
+@login_required(login_url="/accounts/login/")
 def polls(request):
     return render(request, template_name="polls.html", context={"polls": Poll.objects.all()})
 

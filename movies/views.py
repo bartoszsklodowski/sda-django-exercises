@@ -3,88 +3,110 @@ from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView, ListView, FormView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 
 from movies.models import Actor, Country, Movie, Oscar
 from movies.forms import ActorForm, ActorModelForm, CountryForm, CountryModelForm, MovieForm, MovieModelForm
 from movies.forms import OscarForm, OscarModelForm
 
 # WIDOK JAKO FUNKCJA
-def hello(request):
-    year = request.GET.get("year","")
-    return HttpResponse(f'Hello, world! {year}')
 
+@permission_required('movies.view_actor', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def actors(request):
     return render(request, template_name="actors.html", context={"actors": Actor.objects.all()})
 
+@login_required(login_url="/accounts/login/")
 def index_movies(request):
     return render(request, template_name="index_movies.html")
 
+@permission_required('movies.view_countryr', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def countries(request):
     return render(request, template_name="countries.html", context={"countries": Country.objects.all()})
 
+@permission_required('movies.view_movie', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def movies(request):
     return render(request, template_name="movies.html", context={"movies": Movie.objects.all()})
 
+@permission_required('movies.view_oscar', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def oscars(request):
     return render(request, template_name="oscars.html", context={"oscars": Oscar.objects.all()})
 
 
 # WIDOK JAKO KLASA VIEW
-class ActorView(View):
+class ActorView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_actor', ]
 
     def get(self, request):
         return render(request, template_name="actors.html", context={"actors": Actor.objects.all()})
 
-class CountryView(View):
+class CountryView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_country', ]
 
     def get(self, request):
         return render(request, template_name="countries.html", context={"countries": Country.objects.all()})
 
-class MovieView(View):
+class MovieView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_movie', ]
 
     def get(self, request):
         return render(request, template_name="movies.html", context={"movies": Movie.objects.all()})
 
-class OscarView(View):
+class OscarView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_oscar', ]
 
     def get(self, request):
         return render(request, template_name="oscars.html", context={"oscars": Oscar.objects.all()})
 
 # WIDOK JAKO KLASA TEMPLATEVIEW
-class ActorTemplateView(TemplateView):
+class ActorTemplateView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = ['movies.view_actor', ]
     template_name = "actors.html"
     extra_context = {"actors": Actor.objects.all()}
 
-class CountryTemplateView(TemplateView):
+class CountryTemplateView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = ['movies.view_country', ]
     template_name = "countries.html"
     extra_context = {"countries": Country.objects.all()}
 
-class MovieTemplateView(TemplateView):
+class MovieTemplateView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = ['movies.view_movie', ]
     template_name = "movies.html"
     extra_context = {"movies": Movie.objects.all()}
 
-class OscarTemplateView(TemplateView):
+class OscarTemplateView(LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = ['movies.view_oscar', ]
     template_name = "oscars.html"
     extra_context = {"oscars": Oscar.objects.all()}
 
 # WIDOK JAKO KLASA LISTVIEW
-class ActorListView(ListView):
+class ActorListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ['movies.view_actor', ]
     template_name = "actors.html"
     model = Actor
 
-class CountryListView(ListView):
+class CountryListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ['movies.view_country', ]
     template_name = "countries.html"
     model = Country
 
-class MovieListView(ListView):
+class MovieListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ['movies.view_movie', ]
     template_name = "movies.html"
     model = Movie
 
-class OscarListView(ListView):
+class OscarListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    permission_required = ['movies.view_oscar', ]
     template_name = "oscars.html"
     model = Oscar
 
 # FORMULARZ PRZY UZYCIU FUNCKJI
+@permission_required('movies.add_actor', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def actor_form(request):
     form = ActorForm(request.POST or None)
     if form.is_valid():
@@ -95,6 +117,8 @@ def actor_form(request):
         return HttpResponse('ACTOR ADDED')
     return render(request, template_name='form.html', context={'form': form})
 
+@permission_required('movies.add_country', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def country_form(request):
     form = CountryForm(request.POST or None)
     if form.is_valid():
@@ -104,6 +128,8 @@ def country_form(request):
         return HttpResponse('COUNTRY ADDED')
     return render(request, template_name='form.html', context={'form': form})
 
+@permission_required('movies.add_movier', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def movie_form(request):
     form = MovieForm(request.POST or None)
     if form.is_valid():
@@ -119,6 +145,8 @@ def movie_form(request):
         return HttpResponse('MOVIE ADDED')
     return render(request, template_name='form.html', context={'form': form})
 
+@permission_required('movies.add_oscar', login_url="/accounts/login/")
+@login_required(login_url="/accounts/login/")
 def oscar_form(request):
     form = OscarForm(request.POST or None)
     if form.is_valid():
@@ -131,7 +159,8 @@ def oscar_form(request):
     return render(request, template_name='form.html', context={'form': form})
 
 # FORMULARZ PRZY UZYCIU KLASY FORMVIEW
-class ActorFormView(FormView):
+class ActorFormView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    permission_required = ['movies.add_actor', ]
     template_name = "form.html"
     form_class = ActorModelForm
     success_url = reverse_lazy("movies:index")
@@ -147,7 +176,8 @@ class ActorFormView(FormView):
     def form_invalid(self, form):
         return super().form_invalid(form)
 
-class CountryFormView(FormView):
+class CountryFormView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    permission_required = ['movies.add_country', ]
     template_name = "form.html"
     form_class = CountryModelForm
     success_url = reverse_lazy("movies:index")
@@ -162,7 +192,8 @@ class CountryFormView(FormView):
     def form_invalid(self, form):
         return super().form_invalid(form)
 
-class MovieFormView(FormView):
+class MovieFormView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    permission_required = ['movies.add_movie', ]
     template_name = "form.html"
     form_class = MovieModelForm
     success_url = reverse_lazy("movies:index")
@@ -183,7 +214,8 @@ class MovieFormView(FormView):
     def form_invalid(self, form):
         return super().form_invalid(form)
 
-class OscarFormView(FormView):
+class OscarFormView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
+    permission_required = ['movies.add_oscar', ]
     template_name = "form.html"
     form_class = OscarModelForm
     success_url = reverse_lazy("movies:index")
@@ -201,7 +233,8 @@ class OscarFormView(FormView):
         return super().form_invalid(form)
 
 # FORMULARZ PRZY UZYCIU KLASY VIEW
-class ActorFormMethodView(View):
+class ActorFormMethodView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.add_actor', ]
     def get(self, request):
         form = ActorForm()
         return render(
@@ -223,7 +256,8 @@ class ActorFormMethodView(View):
             context={"form": form}
         )
 
-class CountryFormMethodView(View):
+class CountryFormMethodView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.add_country', ]
     def get(self, request):
         form = CountryForm()
         return render(
@@ -244,7 +278,8 @@ class CountryFormMethodView(View):
             context={"form": form}
         )
 
-class MovieFormMethodView(View):
+class MovieFormMethodView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.add_movie', ]
     def get(self, request):
         form = MovieForm()
         return render(
@@ -271,7 +306,8 @@ class MovieFormMethodView(View):
             context={"form": form}
         )
 
-class OscarFormMethodView(View):
+class OscarFormMethodView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.add_oscar', ]
     def get(self, request):
         form = OscarForm()
         return render(
@@ -296,36 +332,37 @@ class OscarFormMethodView(View):
 
 
 # FORMULARZ PRZY UZYCIU KLASY CREATEVIEW - CREATE
-class ActorCreateView(CreateView):
-
+class ActorCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = ['movies.add_actor', ]
     model = Actor
     fields = "__all__"
     template_name = "form.html"
     success_url = reverse_lazy("movies:index")
 
-class CountryrCreateView(CreateView):
-
+class CountryrCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = ['movies.add_country', ]
     model = Country
     fields = "__all__"
     template_name = "form.html"
     success_url = reverse_lazy("movies:index")
 
-class MovieCreateView(CreateView):
-
+class MovieCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = ['movies.add_movie', ]
     model = Movie
     fields = "__all__"
     template_name = "form.html"
     success_url = reverse_lazy("movies:index")
 
-class OscarCreateView(CreateView):
-
+class OscarCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    permission_required = ['movies.add_oscar', ]
     model = Oscar
     fields = "__all__"
     template_name = "form.html"
     success_url = reverse_lazy("movies:index")
 
 # WYSWIETLANIE OBIEKTOW PRZY UZYCIU KLASY VIEW - READ
-class ActorDetailView(View):
+class ActorDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_actor', ]
     def get(self, request, pk):
         obj = get_object_or_404(Actor, pk=pk)
         return render(
@@ -334,7 +371,8 @@ class ActorDetailView(View):
             context={"actor": obj}
         )
 
-class CountryDetailView(View):
+class CountryDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_country', ]
     def get(self, request, pk):
         obj = get_object_or_404(Country, pk=pk)
         return render(
@@ -343,7 +381,8 @@ class CountryDetailView(View):
             context={"country": obj}
         )
 
-class MovieDetailView(View):
+class MovieDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_movie', ]
     def get(self, request, pk):
         obj = get_object_or_404(Movie, pk=pk)
         return render(
@@ -352,7 +391,8 @@ class MovieDetailView(View):
             context={"movie": obj}
         )
 
-class OscarDetailView(View):
+class OscarDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_oscar', ]
     def get(self, request, pk):
         obj = get_object_or_404(Oscar, pk=pk)
         return render(
@@ -362,24 +402,29 @@ class OscarDetailView(View):
         )
 
 # WYSWIETLANIE OBIEKTOW PRZY UZYCIU KLASY DETAILVIEW - READ
-class ActorGenericDetailView(DetailView):
+class ActorGenericDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ['movies.view_actor', ]
     model = Actor
     template_name = "actor.html"
 
-class CountryGenericDetailView(DetailView):
+class CountryGenericDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ['movies.view_country', ]
     model = Country
     template_name = "country.html"
 
-class MovieGenericDetailView(DetailView):
+class MovieGenericDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ['movies.view_movier', ]
     model = Movie
     template_name = "movie.html"
 
-class OscarGenericDetailView(DetailView):
+class OscarGenericDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    permission_required = ['movies.view_oscar',]
     model = Oscar
     template_name = "oscar.html"
 
 # ZMIANA OBIEKTÓW PRZY UZYCIU KLASY VIEW - GET + POST = UPDATE
-class ActorUpdateView(View):
+class ActorUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_actor', 'movies.change_actor',]
 
     def get(self,request, pk):
         form = ActorForm()
@@ -396,7 +441,8 @@ class ActorUpdateView(View):
             return HttpResponseRedirect(reverse("movies:index_movies"))
         return render(request, template_name="form.html", context={"form": form})
 
-class CountryUpdateView(View):
+class CountryUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_country', 'movies.change_country',]
 
     def get(self,request, pk):
         form = CountryForm()
@@ -412,7 +458,8 @@ class CountryUpdateView(View):
             return HttpResponseRedirect(reverse("movies:index_movies"))
         return render(request, template_name="form.html", context={"form": form})
 
-class MovieUpdateView(View):
+class MovieUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_movie', 'movies.change_movie',]
 
     def get(self,request, pk):
         form = MovieForm()
@@ -431,7 +478,8 @@ class MovieUpdateView(View):
 
 
 
-class OscarUpdateView(View):
+class OscarUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = ['movies.view_oscar', 'movies.change_oscar',]
 
     def get(self,request, pk):
         form = OscarForm()
@@ -449,29 +497,29 @@ class OscarUpdateView(View):
 
 
 # ZMIANA OBIEKTÓW PRZY UZYCIU KLASY GENERYCZNEJ (CLASS BASED VIEW) UPDATEVIEW - GET + POST = UPDATE
-class ActorGenericUpdateView(UpdateView):
-    # permission_required = ['movies.view_actor', 'movies.add_actor']
+class ActorGenericUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ['movies.view_actor', 'movies.change_actor',]
     model = Actor
     fields = ("name","last_name", "age",)
     template_name = "form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class CountryGenericUpdateView(UpdateView):
-    # permission_required = ['movies.view_actor', 'movies.add_actor']
+class CountryGenericUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ['movies.view_country', 'movies.change_country',]
     model = Country
     fields = ("name","iso_code",)
     template_name = "form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class MovieGenericUpdateView(UpdateView):
-    # permission_required = ['movies.view_actor', 'movies.add_actor']
+class MovieGenericUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ['movies.view_movie', 'movies.change_movie',]
     model = Movie
     fields = ("title","genre", "year",)
     template_name = "form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class OscarGenericUpdateView(UpdateView):
-    # permission_required = ['movies.view_actor', 'movies.add_actor']
+class OscarGenericUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    permission_required = ['movies.view_oscar', 'movies.change_oscar',]
     model = Actor
     fields = ("category","year", )
     template_name = "form.html"
@@ -479,29 +527,29 @@ class OscarGenericUpdateView(UpdateView):
 
 
 # USUWANIE OBIEKTÓW PRZY UZYCIU KLASY GENERYCZNEJ (CLASS BASED VIEW) DELETEVIEW - DELETE
-class ActorGenericDeleteView(DeleteView):
-    # permission_required = ['movies.delete_actor', ]
+class ActorGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ['movies.delete_actor', ]
     model = Actor
     fields = ("name","last_name", "age",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class CountryGenericDeleteView(DeleteView):
-    # permission_required = ['movies.delete_actor', ]
+class CountryGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ['movies.delete_country', ]
     model = Country
     fields = ("name","iso_code",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class MovieGenericDeleteView(DeleteView):
-    # permission_required = ['movies.delete_actor', ]
+class MovieGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ['movies.delete_movie', ]
     model = Movie
     fields = ("title", "genre", "year",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class OscarGenericDeleteView(DeleteView):
-    # permission_required = ['movies.delete_actor', ]
+class OscarGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    permission_required = ['movies.delete_oscar', ]
     model = Oscar
     fields = ("category","year", )
     template_name = "delete_form.html"
