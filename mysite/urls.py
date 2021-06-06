@@ -16,10 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.contrib.auth.views import LoginView
+from polls.views import homepage
 
 from polls.views import hello
 
 urlpatterns = [
+    path('', homepage, name='homepage'),
     path('admin/', admin.site.urls),
     path('polls/', include('polls.urls')),
     path('movies/', include('movies.urls')),

@@ -16,8 +16,8 @@ def hello(request):
 def actors(request):
     return render(request, template_name="actors.html", context={"actors": Actor.objects.all()})
 
-def index(request):
-    return render(request, template_name="index.html")
+def index_movies(request):
+    return render(request, template_name="index_movies.html")
 
 def countries(request):
     return render(request, template_name="countries.html", context={"countries": Country.objects.all()})

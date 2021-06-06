@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 
-
+def homepage(request):
+    return render(request, template_name="homepage.html")
 
 from polls.models import Poll, Questions, Answer
 from polls.forms import NameForm, PollForm, QuestionForm, AnswerForm, QuestionModelForm, PollModelForm, AnswerModelForm
@@ -43,8 +44,8 @@ def answers(request):
     return render(request, template_name="answers.html", context={"answers": Answer.objects.all()})
 
 
-def index(request):
-    return render(request, template_name="index.html")
+def index_polls(request):
+    return render(request, template_name="index_polls.html")
 
 class PollView(View):
 
