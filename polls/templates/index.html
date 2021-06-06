@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+    <a class="nav-item nav-link active" href="{% url 'polls:polls' %}">Redirect to Polls</a>
+    <a class="nav-item nav-link active" href="{% url 'polls:questions' %}">Redirect to Questions</a>
+    <a class="nav-item nav-link active" href="{% url 'polls:answers' %}">Redirect to Answers</a>
+{% endblock %}

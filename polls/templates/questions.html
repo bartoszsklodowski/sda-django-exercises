@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for question in object_list %}
+    <p><a href="{% url 'polls:question-generic-detail-view' pk=question.pk %}">{{ question }}</a></p>
+    {% endfor %}
+{% endblock %}

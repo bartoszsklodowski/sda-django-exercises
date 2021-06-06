@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Your animals:</h1>
+    {% for animal in animals %}
+      <p>This is a / an {{ animal }}</p>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for poll in object_list %}
+    <p><a href="{% url 'polls:poll-generic-detail-view' pk=poll.pk %}">{{ poll }}</a></p>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h4>LIST VIEW</h4>
+    {% for oscar in object_list %}
+      <li>{{ oscar }}</li>
+    {% endfor %}
+    <h4>OTHER VIEW</h4>
+    {% for oscar in oscars %}
+      <li>ID: {{ oscar.id }}, category: {{ oscar.category }}, year: {{ oscar.year }}</li>
+    {% endfor %}
+{% endblock %}
