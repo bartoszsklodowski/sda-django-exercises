@@ -2,10 +2,10 @@
 {% block content %}
     <h4>LIST VIEW</h4>
     {% for country in object_list %}
-      <li>{{ country }}</li>
+        <p><a href="{% url 'movies:country-generic-detail-view' pk=country.pk %}">{{ country }}</a></p>
     {% endfor %}
     <h4>OTHER VIEW</h4>
     {% for country in countries %}
-      <li>ID: {{ country.id }}, name: {{ country.name }}, iso_code: {{ countries.iso_code }}</li>
+        <p><a href="{% url 'movies:country-generic-detail-view' pk=country.pk %}">{{ country }}</a></p>
     {% endfor %}
 {% endblock %}

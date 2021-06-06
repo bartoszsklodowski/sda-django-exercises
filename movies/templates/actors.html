@@ -2,10 +2,10 @@
 {% block content %}
     <h4>LIST VIEW</h4>
     {% for actor in object_list %}
-      <li>{{ actor }}</li>
+        <p><a href="{% url 'movies:actor-generic-detail-view' pk=actor.pk %}">{{ actor }}</a></p>
     {% endfor %}
     <h4>OTHER VIEW</h4>
     {% for actor in actors %}
-      <li>ID: {{ actor.id }}, name: {{ actor.name }}, lastname: {{ actor.last_name }}, age: {{ actor.age }}</li>
+        <p><a href="{% url 'movies:actor-generic-detail-view' pk=actor.pk %}">{{ actor }}</a></p>
     {% endfor %}
 {% endblock %}
