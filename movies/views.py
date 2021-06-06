@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import TemplateView, ListView, FormView, CreateView, DetailView
+from django.views.generic import TemplateView, ListView, FormView, CreateView, DetailView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 
 from movies.models import Actor, Country, Movie, Oscar
@@ -377,3 +377,132 @@ class MovieGenericDetailView(DetailView):
 class OscarGenericDetailView(DetailView):
     model = Oscar
     template_name = "oscar.html"
+
+# ZMIANA OBIEKTÓW PRZY UZYCIU KLASY VIEW - GET + POST = UPDATE
+class ActorUpdateView(View):
+
+    def get(self,request, pk):
+        form = ActorForm()
+        return render(request, template_name="form.html", context={"form":form})
+
+    def post(self,request, pk):
+        form = ActorForm(request.POST or None)
+        if form.is_valid():
+            q = get_object_or_404(Actor, pk=pk)
+            q.name = form.cleaned_data["name"]
+            q.last_name = form.cleaned_data["last_name"]
+            q.age = form.cleaned_data["age"]
+            q.save()
+            return HttpResponseRedirect(reverse("movies:index_movies"))
+        return render(request, template_name="form.html", context={"form": form})
+
+class CountryUpdateView(View):
+
+    def get(self,request, pk):
+        form = CountryForm()
+        return render(request, template_name="form.html", context={"form":form})
+
+    def post(self,request, pk):
+        form = CountryForm(request.POST or None)
+        if form.is_valid():
+            q = get_object_or_404(Country, pk=pk)
+            q.name = form.cleaned_data["name"]
+            q.iso_code = form.cleaned_data["iso_code"]
+            q.save()
+            return HttpResponseRedirect(reverse("movies:index_movies"))
+        return render(request, template_name="form.html", context={"form": form})
+
+class MovieUpdateView(View):
+
+    def get(self,request, pk):
+        form = MovieForm()
+        return render(request, template_name="form.html", context={"form":form})
+
+    def post(self,request, pk):
+        form = MovieForm(request.POST or None)
+        if form.is_valid():
+            q = get_object_or_404(Movie, pk=pk)
+            q.title = form.cleaned_data["title"]
+            q.genre = form.cleaned_data["genre"]
+            q.year = form.cleaned_data["year"]
+            q.save()
+            return HttpResponseRedirect(reverse("movies:index_movies"))
+        return render(request, template_name="form.html", context={"form": form})
+
+
+
+class OscarUpdateView(View):
+
+    def get(self,request, pk):
+        form = OscarForm()
+        return render(request, template_name="form.html", context={"form":form})
+
+    def post(self,request, pk):
+        form = OscarForm(request.POST or None)
+        if form.is_valid():
+            q = get_object_or_404(Oscar, pk=pk)
+            q.category = form.cleaned_data["category"]
+            q.year = form.cleaned_data["year"]
+            q.save()
+            return HttpResponseRedirect(reverse("movies:index_movies"))
+        return render(request, template_name="form.html", context={"form": form})
+
+
+# ZMIANA OBIEKTÓW PRZY UZYCIU KLASY GENERYCZNEJ (CLASS BASED VIEW) UPDATEVIEW - GET + POST = UPDATE
+class ActorGenericUpdateView(UpdateView):
+    # permission_required = ['movies.view_actor', 'movies.add_actor']
+    model = Actor
+    fields = ("name","last_name", "age",)
+    template_name = "form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class CountryGenericUpdateView(UpdateView):
+    # permission_required = ['movies.view_actor', 'movies.add_actor']
+    model = Country
+    fields = ("name","iso_code",)
+    template_name = "form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class MovieGenericUpdateView(UpdateView):
+    # permission_required = ['movies.view_actor', 'movies.add_actor']
+    model = Movie
+    fields = ("title","genre", "year",)
+    template_name = "form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class OscarGenericUpdateView(UpdateView):
+    # permission_required = ['movies.view_actor', 'movies.add_actor']
+    model = Actor
+    fields = ("category","year", )
+    template_name = "form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+
+# USUWANIE OBIEKTÓW PRZY UZYCIU KLASY GENERYCZNEJ (CLASS BASED VIEW) DELETEVIEW - DELETE
+class ActorGenericDeleteView(DeleteView):
+    # permission_required = ['movies.delete_actor', ]
+    model = Actor
+    fields = ("name","last_name", "age",)
+    template_name = "delete_form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class CountryGenericDeleteView(DeleteView):
+    # permission_required = ['movies.delete_actor', ]
+    model = Country
+    fields = ("name","iso_code",)
+    template_name = "delete_form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class MovieGenericDeleteView(DeleteView):
+    # permission_required = ['movies.delete_actor', ]
+    model = Movie
+    fields = ("title", "genre", "year",)
+    template_name = "delete_form.html"
+    success_url = reverse_lazy("movies:index_movies")
+
+class OscarGenericDeleteView(DeleteView):
+    # permission_required = ['movies.delete_actor', ]
+    model = Oscar
+    fields = ("category","year", )
+    template_name = "delete_form.html"
+    success_url = reverse_lazy("movies:index_movies")
