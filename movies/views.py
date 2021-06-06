@@ -10,6 +10,11 @@ from movies.models import Actor, Country, Movie, Oscar
 from movies.forms import ActorForm, ActorModelForm, CountryForm, CountryModelForm, MovieForm, MovieModelForm
 from movies.forms import OscarForm, OscarModelForm
 
+# TEST AUTORYZACYJNY
+class UserBelongToGroupStaffMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.groups.filter(name="Staff").exists()
+
 # WIDOK JAKO FUNKCJA
 
 @permission_required('movies.view_actor', login_url="/accounts/login/")
@@ -527,28 +532,28 @@ class OscarGenericUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Update
 
 
 # USUWANIE OBIEKTÓW PRZY UZYCIU KLASY GENERYCZNEJ (CLASS BASED VIEW) DELETEVIEW - DELETE
-class ActorGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class ActorGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UserBelongToGroupStaffMixin, DeleteView):
     permission_required = ['movies.delete_actor', ]
     model = Actor
     fields = ("name","last_name", "age",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class CountryGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class CountryGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UserBelongToGroupStaffMixin, DeleteView):
     permission_required = ['movies.delete_country', ]
     model = Country
     fields = ("name","iso_code",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class MovieGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class MovieGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UserBelongToGroupStaffMixin, DeleteView):
     permission_required = ['movies.delete_movie', ]
     model = Movie
     fields = ("title", "genre", "year",)
     template_name = "delete_form.html"
     success_url = reverse_lazy("movies:index_movies")
 
-class OscarGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class OscarGenericDeleteView(LoginRequiredMixin, PermissionRequiredMixin, UserBelongToGroupStaffMixin, DeleteView):
     permission_required = ['movies.delete_oscar', ]
     model = Oscar
     fields = ("category","year", )
