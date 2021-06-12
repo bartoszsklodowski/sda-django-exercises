@@ -402,4 +402,262 @@ class AnswerDeleteView(PermissionRequiredMixin, DeleteView):
     template_name = "delete_form.html"
     success_url = reverse_lazy("polls:index")
 
+# REST API
+from django.http import JsonResponse
+from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
+
+class QuestionListAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request,*args, **kwargs)
+
+    def get(self, request):
+        # serialized_response = serializers.serialize('json', Questions.objects.all())
+        questions = list(Questions.objects.all().values('id', 'questions_text', 'poll'))
+        return JsonResponse({'questions': questions})
+
+    def post(self, request):
+        body = request.POST
+        questions_text = body.get('questions_text')
+        poll_id = body.get('poll_id')
+        if not questions_text:
+            return JsonResponse({"error": "question_text field required"}, status=400)
+        if not poll_id:
+            return JsonResponse({"error": "poll_id field required"}, status=400)
+        try:
+            poll = Poll.objects.get(id=poll_id)
+        except Poll.DoesNotExist:
+            response_data = {
+                "error": f"Object with pk {poll_id} does not exists!"
+            }
+            return JsonResponse(response_data, status=404)
+        else:
+            q = Questions.objects.create(questions_text=questions_text, poll=poll)
+            status = 201
+        return JsonResponse({"id": q.id}, status=status)
+
+class QuestionsDetailAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, pk):
+        try:
+            question = Questions.objects.get(pk=pk)
+        except Questions.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        else:
+            response_data = {
+                "id": question.id,
+                "questions_text": question.questions_text,
+                "poll": question.poll.id
+            }
+        return JsonResponse(response_data)
+
+    def delete(self, request, pk):
+        try:
+            question = Questions.objects.get(pk=pk)
+        except Questions.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        question.delete()
+        return JsonResponse({})
+
+    def put(self, request, pk):
+        from django.http import QueryDict
+        put_params = QueryDict(request.body)
+        questions_text = put_params.get("questions_text")
+        poll_id = put_params.get("poll_id")
+        try:
+            question = Questions.objects.get(pk=pk)
+        except Questions.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        try:
+            poll = Poll.objects.get(id=poll_id)
+        except Poll.DoesNotExist:
+            response_data = {
+                "error": f"Object with pk {poll_id} does not exists!"
+            }
+            return JsonResponse(response_data, status=404)
+        question.questions_text = questions_text
+        question.poll = poll
+        question.save()
+
+        question.refresh_from_db()
+
+        response_data = {
+            "id": question.id,
+            "questions_text": question.questions_text,
+            "poll": question.poll.id
+        }
+
+        return JsonResponse(response_data)
+
+
+class PollListAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request,*args, **kwargs)
+
+    def get(self, request):
+        polls = list(Poll.objects.all().values('id', 'name'))
+        return JsonResponse({'polls': polls})
+
+    def post(self, request):
+        body = request.POST
+        name = body.get("name")
+        if not name:
+            return JsonResponse({"error": "name field required"}, status=400)
+        p = Poll.objects.create(name=name)
+        return JsonResponse({"id": p.id}, status=201)
+
+
+class PollsDetailAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, pk):
+        try:
+            poll = Poll.objects.get(pk=pk)
+        except Poll.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        else:
+            response_data = {
+                "id": poll.id,
+                "name": poll.name
+            }
+        return JsonResponse(response_data)
+
+    def delete(self, request, pk):
+        try:
+            poll = Poll.objects.get(pk=pk)
+        except Poll.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        poll.delete()
+        return JsonResponse({})
+
+    def put(self, request, pk):
+        from django.http import QueryDict
+        put_params = QueryDict(request.body)
+        name = put_params.get("name")
+        try:
+            poll = Poll.objects.get(pk=pk)
+        except Poll.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+
+        poll.name = name
+        poll.save()
+
+        poll.refresh_from_db()
+
+        response_data = {
+            "id": poll.id,
+            "name": poll.name
+        }
+
+        return JsonResponse(response_data)
+
+
+class AnswersListAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request,*args, **kwargs)
+
+    def get(self, request):
+        answers = list(Answer.objects.all().values('id', 'answer_text', 'question'))
+        return JsonResponse({'answers': answers})
+
+    def post(self, request):
+        body = request.POST
+        answer_text = body.get("answer_text")
+        question_id = body.get('question_id')
+        if not answer_text:
+            return JsonResponse({"error": "answer_text field required"}, status=400)
+        if not question_id:
+            return JsonResponse({"error": "question_id field required"}, status=400)
+        try:
+            question = Questions.objects.get(id=question_id)
+        except Questions.DoesNotExist:
+            response_data = {
+                "error": f"Object with pk {question_id} does not exists!"
+            }
+            return JsonResponse(response_data, status=404)
+        else:
+            a = Answer.objects.create(answer_text=answer_text, question=question)
+            status = 201
+        return JsonResponse({"id": a.id}, status=status)
+
+
+class AnswersDetailAPIView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, pk):
+        try:
+            answer = Answer.objects.get(pk=pk)
+        except Answer.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        else:
+            response_data = {
+                "id": answer.id,
+                "answer_text": answer.answer_text,
+                "question": answer.question.questions_text,
+            }
+        return JsonResponse(response_data)
+
+    def delete(self, request, pk):
+        try:
+            answer = Answer.objects.get(pk=pk)
+        except Answer.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        answer.delete()
+        return JsonResponse({})
+
+    def put(self, request, pk):
+        from django.http import QueryDict
+        put_params = QueryDict(request.body)
+        answer_text = put_params.get("answer_text")
+        question_id = put_params.get("question_id")
+        try:
+            answer = Answer.objects.get(pk=pk)
+        except Answer.DoesNotExist:
+            response_data = {"error": f"Object with pk {pk} does not exists!"}
+            return JsonResponse(response_data, status=404)
+        try:
+            question = Questions.objects.get(id=question_id)
+        except Questions.DoesNotExist:
+            response_data = {
+                "error": f"Object with pk {question_id} does not exists!"
+            }
+            return JsonResponse(response_data, status=404)
+        answer.answer_text = answer_text
+        answer.question = question
+        answer.save()
+
+        answer.refresh_from_db()
+
+        response_data = {
+            "id": answer.id,
+            "questions_text": answer.answer_text,
+            "poll": answer.question.questions_text
+        }
+
+        return JsonResponse(response_data)

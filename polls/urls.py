@@ -11,6 +11,8 @@ from polls.views import QuestionGenericDetailView, PollGenericDetailView, Answer
 from polls.views import QuestionUpdateView, PollUpdateView, AnswerUpdateView
 from polls.views import QuestionGenericUpdateView, PollGenericUpdateView, AnswerGenericUpdateView
 from polls.views import QuestionDeleteView, PollDeleteView, AnswerDeleteView
+from polls.views import QuestionListAPIView, QuestionsDetailAPIView, PollListAPIView, PollsDetailAPIView
+from polls.views import AnswersListAPIView, AnswersDetailAPIView
 
 app_name = "polls"
 
@@ -22,9 +24,9 @@ urlpatterns = [
     path('hello/<str:s0>/', hello),
     path('animals/', animals),
 
-    path('polls/', polls, name='polls'),
-    path('questions/', questions, name='questions'),
-    path('answers/', answers, name='answers'),
+    path('polls1/', polls, name='polls'),
+    path('questions1/', questions, name='questions'),
+    path('answers1/', answers, name='answers'),
 
     path('polls-class/', PollView.as_view(), name='polls-class'),
     path('polls-template/', PollTemplateView.as_view(), name='polls-template'),
@@ -75,5 +77,12 @@ urlpatterns = [
     path('question-delete-view/<pk>/', QuestionDeleteView.as_view(), name = 'question-delete-view'),
     path('answer-delete-view/<pk>/', AnswerDeleteView.as_view(), name = 'answer-delete-view'),
 
+    path('questions/', QuestionListAPIView.as_view(), name='questions-list'),
+    path('questions/<pk>/', QuestionsDetailAPIView.as_view(), name='questions-detail'),
 
+    path('polls/', PollListAPIView.as_view(), name='polls-list'),
+    path('polls/<pk>/', PollsDetailAPIView.as_view(), name='polls-detail'),
+
+    path('answers/', AnswersListAPIView.as_view(), name='answers-list'),
+    path('answers/<pk>/', AnswersDetailAPIView.as_view(), name='answers-detail'),
 ]
