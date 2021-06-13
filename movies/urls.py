@@ -11,15 +11,17 @@ from movies.views import ActorGenericDetailView, CountryGenericDetailView, Movie
 from movies.views import ActorUpdateView, CountryUpdateView, MovieUpdateView, OscarUpdateView
 from movies.views import ActorGenericUpdateView, CountryGenericUpdateView, MovieGenericUpdateView, OscarGenericUpdateView
 from movies.views import ActorGenericDeleteView, CountryGenericDeleteView, MovieGenericDeleteView, OscarGenericDeleteView
+from movies.views import ActorListAPIView, ActorDetailAPIView, CountryListAPIView, CountryDetailAPIView
+from movies.views import MovieListAPIView, MovieDetailAPIView, OscarListAPIView, OscarDetailAPIView
 
 app_name = "movies"
 
 urlpatterns = [
     path('', index_movies, name='index'),
-    path('actors/', actors, name='actors'),
-    path('countries/', countries, name='countries'),
-    path('movies/', movies, name='movies'),
-    path('oscars/', oscars, name='oscars'),
+    path('actors1/', actors, name='actors'),
+    path('countries1/', countries, name='countries'),
+    path('movies1/', movies, name='movies'),
+    path('oscars1/', oscars, name='oscars'),
 
     path('actors-class/', ActorView.as_view(), name='actors-class'),
     path('actors-template/', ActorTemplateView.as_view(), name='actors-template'),
@@ -81,4 +83,17 @@ urlpatterns = [
     path('country-delete-view/<pk>/', CountryGenericDeleteView.as_view(), name = 'country-delete-view'),
     path('movie-delete-view/<pk>/', MovieGenericDeleteView.as_view(), name = 'movie-delete-view'),
     path('oscar-delete-view/<pk>/', OscarGenericDeleteView.as_view(), name = 'oscar-delete-view'),
+
+    path('actors/', ActorListAPIView.as_view(), name='actors-list'),
+    path('actors/<pk>/', ActorDetailAPIView.as_view(), name='actors-detail'),
+
+    path('countries/', CountryListAPIView.as_view(), name='countries-list'),
+    path('countries/<pk>/', CountryDetailAPIView.as_view(), name='countries-detail'),
+
+    path('movies/', MovieListAPIView.as_view(), name='movies-list'),
+    path('movies/<pk>/', MovieDetailAPIView.as_view(), name='movies-detail'),
+
+    path('oscars/', OscarListAPIView.as_view(), name='oscars-list'),
+    path('oscars/<pk>/', OscarDetailAPIView.as_view(), name='oscars-detail'),
+
 ]
